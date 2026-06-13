@@ -10,7 +10,9 @@ struct StorageUnit {
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({1000, 600}), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode({1000, 600}), "arrangatan");
+    window.setFramerateLimit(60);
+
     vector<StorageUnit> storageBoxes;
 
     int totalUnits = 3;
@@ -42,22 +44,57 @@ int main()
     bigRect.setOutlineThickness(4.f);
     bigRect.setPosition(sf::Vector2f(200.f, 175.f));
 
+    sf::RectangleShape draggableItem;
+    draggableItem.setSize(sf::Vector2f(80.f, 80.f)); 
+    draggableItem.setFillColor(sf::Color(180, 80, 80));  
+    draggableItem.setPosition(sf::Vector2f(450.f, 480.f));   
+    
+    bool isDragging = false;
+    sf::Vector2f mouseOffset;
+
     while (window.isOpen())
-    {
+    {   
         while (auto event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
                 window.close();
+        
+            //pick the item up
+            if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+                if (mousePressed->button == sf::Mouse::Button::Left) {
+                    // get current mouse position
+                    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    // is mouse on the item, apply offset
+                    if (draggableItem.getGlobalBounds().contains(mousePos)) {
+                        isDragging = true;
+                        mouseOffset = mousePos - draggableItem.getPosition();
+                    }
+                }
+            }
+
+            // drop the item
+            if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
+                if (mouseReleased->button == sf::Mouse::Button::Left) 
+                    isDragging = false;
+            }
         }
 
-        window.clear(sf::Color(245, 242, 235));
+        if (isDragging) {
+            // get current mouse position and move the item with the mouse (maintaining offset)
+            sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            draggableItem.setPosition(mousePos - mouseOffset);
+        }
+
+        window.clear(sf::Color(245, 242, 235)); // so dragging doesn't leave a trail behind
 
         for (const auto& unit : storageBoxes) {
-            window.draw(unit.shape);
+            window.draw(unit.shape); // draw the cabinet sections
         }
 
         window.draw(bigRect); 
+        window.draw(draggableItem);
 
         window.display();
     }
+    return 0;
 }
