@@ -44,12 +44,18 @@ int main()
     bigRect.setOutlineThickness(4.f);
     bigRect.setPosition(sf::Vector2f(200.f, 175.f));
 
-    sf::RectangleShape draggableItem;
-    draggableItem.setSize(sf::Vector2f(80.f, 80.f)); 
-    draggableItem.setFillColor(sf::Color(180, 80, 80));  
-    draggableItem.setPosition(sf::Vector2f(450.f, 480.f));   
+    sf::RectangleShape draggableItem1;
+    draggableItem1.setSize(sf::Vector2f(80.f, 80.f)); 
+    draggableItem1.setFillColor(sf::Color(180, 80, 80));  
+    draggableItem1.setPosition(sf::Vector2f(450, 480));   
+    
+    sf::RectangleShape draggableItem2;
+    draggableItem2.setSize(sf::Vector2f(80.f, 80.f)); 
+    draggableItem2.setFillColor(sf::Color(244, 196, 48));  
+    draggableItem2.setPosition(sf::Vector2f(600, 480));   
     
     bool isDragging = false;
+    sf::RectangleShape* draggedItem = nullptr;
     sf::Vector2f mouseOffset;
 
     while (window.isOpen())
@@ -65,9 +71,15 @@ int main()
                     // get current mouse position
                     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                     // is mouse on the item, apply offset
-                    if (draggableItem.getGlobalBounds().contains(mousePos)) {
+                    if (draggableItem1.getGlobalBounds().contains(mousePos)) {
                         isDragging = true;
-                        mouseOffset = mousePos - draggableItem.getPosition();
+                        draggedItem = &draggableItem1;
+                        mouseOffset = mousePos - draggableItem1.getPosition();
+                    } // making more draggable items
+                    else if (draggableItem2.getGlobalBounds().contains(mousePos)) {
+                        isDragging = true;
+                        draggedItem = &draggableItem2;
+                        mouseOffset = mousePos - draggableItem2.getPosition();
                     }
                 }
             }
@@ -76,13 +88,14 @@ int main()
             if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
                 if (mouseReleased->button == sf::Mouse::Button::Left) 
                     isDragging = false;
+                    draggedItem = nullptr;
             }
         }
 
         if (isDragging) {
             // get current mouse position and move the item with the mouse (maintaining offset)
             sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-            draggableItem.setPosition(mousePos - mouseOffset);
+            draggedItem->setPosition(mousePos - mouseOffset);
         }
 
         window.clear(sf::Color(245, 242, 235)); // so dragging doesn't leave a trail behind
@@ -92,7 +105,8 @@ int main()
         }
 
         window.draw(bigRect); 
-        window.draw(draggableItem);
+        window.draw(draggableItem1);
+        window.draw(draggableItem2);
 
         window.display();
     }
