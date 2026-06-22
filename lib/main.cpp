@@ -8,7 +8,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode({1000, 600}), "arrangatan");
     window.setFramerateLimit(60);
 
-    // Create storage units (all rectangles by default)
+    // Create storage units (rectangle by default)
     std::vector<StorageUnit> units;
     units.emplace_back(200, 200, 150, 200);
     units.emplace_back(400, 200, 180, 150);
