@@ -1,13 +1,16 @@
 #include "circularUnit.hpp"
 #include <cmath>
 
-CircularUnit::CircularUnit(float x, float y, float radius) {
+CircularUnit::CircularUnit(float x, float y, float radius)
+    : StorageUnit(x, y, radius * 2, radius * 2)
+{
     shape.setRadius(radius);
     shape.setPosition({x, y});
     shape.setFillColor(sf::Color(220, 215, 200));
     shape.setOutlineColor(sf::Color(100, 90, 80));
     shape.setOutlineThickness(5.f);
 }
+
 
 void CircularUnit::draw(sf::RenderWindow& window) const {
     window.draw(shape);

@@ -20,14 +20,17 @@ int main() {
     items.emplace_back(600, 480, 80, sf::Color(244, 196, 48));
 
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
 
-            // Mouse press
-            if (event.type == sf::Event::MouseButtonPressed &&
-                event.mouseButton.button == sf::Mouse::Left) {
+    while (auto event = window.pollEvent()) {
+
+        // Window close
+        if (event->is<sf::Event::Closed>()) {
+            window.close();
+        }
+
+        // Mouse press
+        if (auto* mouse = event->getIf<sf::Event::MouseButtonPressed>()) {
+            if (mouse->button == sf::Mouse::Button::Left) {
 
                 sf::Vector2f mousePos = window.mapPixelToCoords(
                     sf::Mouse::getPosition(window));
@@ -35,34 +38,36 @@ int main() {
                 for (auto& item : items)
                     item.handleMousePress(mousePos);
             }
+        }
 
-            // Mouse release
-            if (event.type == sf::Event::MouseButtonReleased &&
-                event.mouseButton.button == sf::Mouse::Left) {
+        // Mouse release
+        if (auto* mouse = event->getIf<sf::Event::MouseButtonReleased>()) {
+            if (mouse->button == sf::Mouse::Button::Left) {
 
                 for (auto& item : items)
                     item.handleMouseRelease();
             }
         }
-
-        // Update dragging
-        sf::Vector2f mousePos = window.mapPixelToCoords(
-            sf::Mouse::getPosition(window));
-
-        for (auto& item : items)
-            item.updatePosition(mousePos);
-
-        // Draw everything
-        window.clear(sf::Color(245, 242, 235));
-
-        for (auto& u : units)
-            u.draw(window);
-
-        for (auto& item : items)
-            item.draw(window);
-
-        window.display();
     }
+
+    // Update dragging
+    sf::Vector2f mousePos = window.mapPixelToCoords(
+        sf::Mouse::getPosition(window));
+
+    for (auto& item : items)
+        item.updatePosition(mousePos);
+
+    // Draw everything
+    window.clear(sf::Color(245, 242, 235));
+
+    for (auto& u : units)
+        u.draw(window);
+
+    for (auto& item : items)
+        item.draw(window);
+
+    window.display();
+}
 
     return 0;
 }
